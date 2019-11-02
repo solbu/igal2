@@ -1,0 +1,42 @@
+******                       igal2 README                       ******
+******                                                          ******
+
+iGal2 needs Perl to run and either cjpeg/djpeg/pnmscale (from libjpeg) 
+or ImageMagick or GraphicksMagick to generate your thumbnails. 
+These come standard with most Linux distributions today.
+
+------------------------------------------------------------------------
+
+To install from the tarball (as root)
+    make install
+
+This will put the relevant files in /usr/local/{bin or lib}/igal2 .  
+You can change this destination by modifying the DESTDIR at the top of
+ the Makefile and the LIBDIR variable at the 8th line of iGal code.
+
+To uninstall from the tarball (as root)
+    make clean
+
+------------------------------------------------------------------------
+
+UPGRADE from version 1.4 (and older):
+igal2 supports a lot of new features and therefore the format of the
+template files had to be changed. igal2 installs all its template
+files under /usr/local/lib/igal2.  Please add your design changes there.
+
+If you want to use igal and igal2 side by side, please be sure not
+to overwrite "igal" when asked through the install script.
+
+As igal (1.4) stores all necessary templates and files within the image
+directory you may savely delete all old igal 1.4 (or older) files when
+satisfied with igal2.
+
+This can be done with 
+    make old-clean
+
+------------------------------------------------------------------------
+
+iGal2 is copyright 2000 Eric Pop <epop@stanford.edu> and Wolfgang 
+Trexler 2016 <wt-igal@trexler.at>.  It is distributed under the terms of
+the GNU General Public License, see the file COPYING in the source 
+distribution for details.
