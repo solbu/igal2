@@ -1,3 +1,8 @@
+2019-11-15  Johnny A. Solbu <johnny@solbu.net>
+
+	* Generate mobile-friendly html-pages
+	* Switch from ISO-8859-1 to UTF-8 encoding
+
 Thu, June 2, 2016: Wolfgang Trexler
 	* Version 2.2 - minor changes
 	* removed define(@array) as this is deprecated in newer perl versions
