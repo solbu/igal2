@@ -36,7 +36,12 @@ This can be done with
 
 ------------------------------------------------------------------------
 
-iGal2 is copyright 2000 Eric Pop <epop@stanford.edu> and Wolfgang 
-Trexler 2016 <wt-igal@trexler.at>.  It is distributed under the terms of
-the GNU General Public License, see the file COPYING in the source 
-distribution for details.
+Copyright:
+2000: Eric Pop <epop@stanford.edu>, 
+2016: Wolfgang Trexler <wt-igal@trexler.at>,
+2019: Johnny A. Solbu <johnny@solbu.net>
+
+igal2 is distributed under the terms of the GNU General Public License 
+as published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+See the file COPYING for details.
