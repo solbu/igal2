@@ -171,7 +171,7 @@ Authors:      Wolfgang Trexler <wt-igal\@trexler.at>
 	      contributions: 
               Stewart Addison <contactsxa\@gmail.com>, Riku Kalinen,
               Alexander Zangerl
-URL:          http://igal.trexler.at/
+URL:          https://github.com/solbu/igal2
 END_OF_USAGE
 
 # store command-line options upfront to write in the index <HEAD>
