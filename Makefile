@@ -6,7 +6,7 @@ IGALDIR=$(DATADIR)/igal2
 
 OLDLIBDIR=$(PREFIX)/lib/igal
 
-clean::
+uninstall::
 	rm -rf $(DESTDIR)$(IGALDIR)
 	rm -f $(DESTDIR)$(BINDIR)/igal2
 	rm -f $(DESTDIR)$(BINDIR)/igal
@@ -27,4 +27,4 @@ install:: igal2
 	install -m 0644 igal2.1 $(DESTDIR)$(MANDIR)
 	install -d $(DESTDIR)$(IGALDIR)
 	install -m 0644 README ChangeLog COPYING indextemplate2.html slidetemplate2.html tile.png igal2.css directoryline2.html $(DESTDIR)$(IGALDIR)
-	sed -i 's_/usr/local_$(PREFIX)_' $(DESTDIR)$(BINDIR)/igal2 $(DESTDIR)$(MANDIR)/igal2.1
+	sed -i 's_/usr/local_$(PREFIX)_' $(DESTDIR)$(BINDIR)/{igal2,igal2.sh} $(DESTDIR)$(MANDIR)/igal2.1
