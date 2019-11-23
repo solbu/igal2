@@ -7,19 +7,19 @@ IGALDIR=$(DATADIR)/$(NAME)
 
 OLDLIBDIR=$(PREFIX)/lib/igal
 
-uninstall::
+uninstall:
 	rm -rf $(DESTDIR)$(IGALDIR)
 	rm -f $(DESTDIR)$(BINDIR)/$(NAME)
 	rm -f $(DESTDIR)$(BINDIR)/igal
 	rm -f $(DESTDIR)$(MANDIR)/$(NAME).1
 	rm -f $(DESTDIR)$(BINDIR)/$(NAME).sh
 
-old-clean::
+old-clean:
 	rm -rf $(DESTDIR)$(OLDLIBDIR)
 	rm -f $(DESTDIR)$(BINDIR)/igal
 	rm -f $(DESTDIR)$(MANDIR)/igal.1
 
-install:: $(NAME)
+install:
 	install -d $(DESTDIR)$(BINDIR)
 	install -m 0755 $(NAME) $(DESTDIR)$(BINDIR)
 	ln -si $(NAME) $(DESTDIR)$(BINDIR)/igal
