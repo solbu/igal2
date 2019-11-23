@@ -50,7 +50,7 @@ Mon, Jan 3, 2005: (Wolfgang Trexler)
 	* minor code cleanup
 Fri, April 11, 2003:
 	* igal enhanced 1.4.1-wt is an enhanced version of original igal 1.4
-	* This release was done by Wolfgang Trexler <wolfgang@trexler.at>
+	* This release was done by Wolfgang Trexler <wt-igal@@trexler.at>
 	* Support for image filenames with international characters and special
 	  characters like \, <, >, #, %, " or  white space.
 	  igal no longer renames your files if they contain characters that are
