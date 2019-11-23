@@ -5,7 +5,7 @@ eval 'exec perl -wS $0 ${1+"$@"}'
 ############################################################################
 # Please change this accordingly if you change the DESTDIR in the tarball 
 # distribution Makefile or the --prefix of the RPM installation
-$IGALDIR = "/usr/share/igal2";
+$IGALDIR = "/usr/local/share/igal2";
 # for example if you make DESTDIR=/usr then $IGALDIR="/usr/share/igal2"
 ############################################################################
 #
