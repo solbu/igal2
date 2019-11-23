@@ -19,7 +19,7 @@ To install this in /usr (/usr/bin and /usr/share/igal2)
 run «make PREFIX=/usr install».
 
 To uninstall from the tarball (as root)
-    make clean
+    make uninstall
 
 ------------------------------------------------------------------------
 
