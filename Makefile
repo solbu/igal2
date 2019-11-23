@@ -7,6 +7,8 @@ IGALDIR=$(DATADIR)/$(NAME)
 
 OLDLIBDIR=$(PREFIX)/lib/igal
 
+all:
+
 uninstall:
 	rm -rf $(DESTDIR)$(IGALDIR)
 	rm -f $(DESTDIR)$(BINDIR)/$(NAME)
