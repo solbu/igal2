@@ -1,6 +1,11 @@
 2019-11-23  Johnny A. Solbu <johnny@solbu.net>
 
 	* Version 2.3
+	* Makefile: 
+	  default install folders can be changed by using 
+	  «make DESTDIR=/blah/bleh PREFIX=/usr install». This will also change
+	  the paths used in the various files. No more need for distro
+	  patches.
 
 2019-11-15  Johnny A. Solbu <johnny@solbu.net>
 
