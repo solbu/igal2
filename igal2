@@ -1,12 +1,12 @@
-: magical incantation finds Perl as long as it's in the user's path
+#!/usr/bin/perl
 eval 'exec perl -wS $0 ${1+"$@"}'
 	if 0;
 
 ############################################################################
 # Please change this accordingly if you change the DESTDIR in the tarball 
 # distribution Makefile or the --prefix of the RPM installation
-$LIBDIR = "/usr/local/lib/igal2";
-# for example if you make DESTDIR=/usr then $LIBDIR="/usr/lib/igal2"
+$IGALDIR = "/usr/share/igal2";
+# for example if you make DESTDIR=/usr then $IGALDIR="/usr/share/igal2"
 ############################################################################
 #
 # A short note from Eric Pop the developer of the "old" igal version:
@@ -212,8 +212,8 @@ die "Critical failure: Lib Image::ExifTool not install but EXIF Tags (option -e)
 $opt_d =~ s/\/$//;
 
 # let users store their templates in a $HOME/.igal directory, if it exists,
-# instead of the site-wide /usr/local/lib/igal (from line 8 up top)
-$LIBDIR = $userigaldir if ((-r $userigaldir) && (-d $userigaldir));
+# instead of the site-wide /usr/lib/igal (from line 8 up top)
+$IGALDIR = $userigaldir if ((-r $userigaldir) && (-d $userigaldir));
 
 # load up image files from $opt_d into array @imgfiles
 opendir DIR, $opt_d or die "Can't open directory $opt_d\n";
@@ -484,10 +484,10 @@ if ( $opt_m ) {
 if ($opt_s) {
 	print "Linking thumbnails directly to image files...  Making no html slides.\n";
 	if (! -e "$opt_d/$opt_dest$csstemplate") {
-		print "No CSS template file ... getting $LIBDIR/$csstemplate\n";
-		die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-		die "$LIBDIR/$csstemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$csstemplate");
-		system("cp -f $LIBDIR/$csstemplate \"$opt_d/$opt_dest\"");
+		print "No CSS template file ... getting $IGALDIR/$csstemplate\n";
+		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+		die "$IGALDIR/$csstemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$csstemplate");
+		system("cp -f $IGALDIR/$csstemplate \"$opt_d/$opt_dest\"");
         }
 } else {
 	$nfiles = @imgfiles;      # total number of files (same as # of captions)
@@ -505,18 +505,18 @@ if ($opt_s) {
 	}
 	system("rm -f \"$opt_d/$opt_dest*.html\"");
 	if (! -e "$opt_d/$opt_dest$csstemplate") {
-		print "No CSS template file ... getting $LIBDIR/$csstemplate\n";
-		die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-		die "$LIBDIR/$csstemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$csstemplate");
-		system("cp -f $LIBDIR/$csstemplate \"$opt_d/$opt_dest\"");
+		print "No CSS template file ... getting $IGALDIR/$csstemplate\n";
+		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+		die "$IGALDIR/$csstemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$csstemplate");
+		system("cp -f $IGALDIR/$csstemplate \"$opt_d/$opt_dest\"");
 	} else {
 		print "Found CSS template file $opt_dest$csstemplate ... using it.\n";
 	}
 	if (! -e "$opt_d/$opt_dest.$slidetemplate") {
-		print "No $opt_dest.$slidetemplate file ... getting a copy from $LIBDIR/\n";
-		die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-		die "$LIBDIR/$slidetemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$slidetemplate");
-		system("cp -f $LIBDIR/$slidetemplate \"$opt_d/$opt_dest.$slidetemplate\"");
+		print "No $opt_dest.$slidetemplate file ... getting a copy from $IGALDIR/\n";
+		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+		die "$IGALDIR/$slidetemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$slidetemplate");
+		system("cp -f $IGALDIR/$slidetemplate \"$opt_d/$opt_dest.$slidetemplate\"");
 	} else {
 		print "Found $opt_dest.$slidetemplate file ... using it.\n";
 	}
@@ -624,10 +624,10 @@ if ($opt_s) {
 if ($opt_r) {
 	print "Got option -r... omitting film reel effect.\n";
 } elsif (! -e "$opt_d/$opt_dest.$itile") {
-	print "No $opt_dest.$itile file... getting a copy from $LIBDIR/\n";
-	die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-	die "$LIBDIR/$itile cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$itile");
-	system("cp -f $LIBDIR/$itile \"$opt_d/$opt_dest.$itile\"");
+	print "No $opt_dest.$itile file... getting a copy from $IGALDIR/\n";
+	die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+	die "$IGALDIR/$itile cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$itile");
+	system("cp -f $IGALDIR/$itile \"$opt_d/$opt_dest.$itile\"");
 } else {
 	print "Found $opt_dest.$itile file ... using it.\n";
 }
@@ -639,10 +639,10 @@ if (($HAVEIM) and (! $opt_r)) {
 }
 
 if (! -e "$opt_d/$opt_dest.$indextemplate") {
-	print "No $opt_dest.$indextemplate file... getting a copy from $LIBDIR/\n";
-	die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-	die "$LIBDIR/$indextemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$indextemplate");
-	system("cp -f $LIBDIR/$indextemplate \"$opt_d/$opt_dest.$indextemplate\"");
+	print "No $opt_dest.$indextemplate file... getting a copy from $IGALDIR/\n";
+	die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+	die "$IGALDIR/$indextemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$indextemplate");
+	system("cp -f $IGALDIR/$indextemplate \"$opt_d/$opt_dest.$indextemplate\"");
 } else {
 	print "Found $opt_dest.$indextemplate ... using it.\n";
 }
@@ -656,10 +656,10 @@ $indexfile =~ s/<!--#IGAL-CSS#-->/$opt_dest$csstemplate/g; # set the name (and p
 if ($opt_AddSubdir && @directories) {
 
 	if (! -e "$opt_d/$opt_dest.$directorylinefile") {
-		print "No $opt_dest.$directorylinefile file ... getting a copy from $LIBDIR/\n";
-		die "$LIBDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $LIBDIR);
-		die "$LIBDIR/$directorylinefile cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$LIBDIR/$directorylinefile");
-		system("cp -f $LIBDIR/$directorylinefile \"$opt_d/$opt_dest.$directorylinefile\"");
+		print "No $opt_dest.$directorylinefile file ... getting a copy from $IGALDIR/\n";
+		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+		die "$IGALDIR/$directorylinefile cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$directorylinefile");
+		system("cp -f $IGALDIR/$directorylinefile \"$opt_d/$opt_dest.$directorylinefile\"");
 	} else {
 		print "Found $opt_dest.$directorylinefile file ... using it.\n";
 	}

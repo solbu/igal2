@@ -1,5 +1,5 @@
 #
-SCRIPTPATH="/usr/local/bin";
+SCRIPTPATH="/usr/bin";
 # echo "Examing $1";
 FOUND=`find "$1/" -iname "*.jpg" -maxdepth 1`;
 if [ \( ! -f "$1/index.html" \) -a -n "$FOUND" ];
