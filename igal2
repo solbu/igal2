@@ -166,7 +166,8 @@ Options:     -a           write image sizes under thumbnails on index page
                           of parameter -w (default 5).
                           Default 0 - means no pagination at all.
 Note:         default values are given in parentheses (where applicable).
-Authors:      Wolfgang Trexler <wt-igal\@trexler.at>
+Authors:      Johnny A. Solbu <johnny\@solbu.net>
+              Wolfgang Trexler <wt-igal\@trexler.at>
               Eric Pop <epop\@stanford.edu> (original igal)
 	      contributions: 
               Stewart Addison <contactsxa\@gmail.com>, Riku Kalinen,
