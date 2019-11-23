@@ -118,7 +118,7 @@ $opt_AddSubdir = "0";  # Add subdirectories to index.html file
 $opt_pagination = "0"; # maximum number of images on one page, zero means no pagination
 
 $usage = <<"END_OF_USAGE";
-This is iGal2 $VERSION an HTML image slide show generator.
+This is iGal2 v$VERSION an HTML image slide show generator.
 Syntax:  igal [-option -option ...]
 Options:     -a           write image sizes under thumbnails on index page
              -c           first generate and then use captions
