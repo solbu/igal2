@@ -30,7 +30,7 @@ install:
 	install -m 0644 $(NAME).1 $(DESTDIR)$(MANDIR)
 	install -d $(DESTDIR)$(IGALDIR)
 	install -m 0644 README ChangeLog COPYING indextemplate2.html slidetemplate2.html tile.png $(NAME).css directoryline2.html $(DESTDIR)$(IGALDIR)
-	sed -i 's_/usr/local_$(PREFIX)_' $(DESTDIR)$(BINDIR)/{$(NAME),$(NAME).sh} $(DESTDIR)$(MANDIR)/$(NAME).1
+	sed -i 's_/usr/local_$(PREFIX)_' $(DESTDIR)$(BINDIR)/$(NAME) $(DESTDIR)$(BINDIR)/$(NAME).sh $(DESTDIR)$(MANDIR)/$(NAME).1
 
 
 
