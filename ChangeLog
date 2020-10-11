@@ -1,3 +1,8 @@
+2020-10-11  Johnny A. Solbu <johnny@solbu.net>
+
+	* Version 2.4
+	* Makefile: Don't assume bash is installed.
+
 2019-11-23  Johnny A. Solbu <johnny@solbu.net>
 
 	* Version 2.3
