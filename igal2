@@ -391,6 +391,9 @@ if ($opt_c or $opt_C) {
 # if they don't exist already or if the -f switch is given
 
 print "Creating thumbnails:  ";
+
+$tmpthumb = "$opt_d/.thumbtmp.png";
+
 for ($i = 0; $i < $nfiles; $i++) {
 	$file = $imgfiles[$i];
 	$fullfile = "$opt_d/$file";
@@ -406,12 +409,11 @@ for ($i = 0; $i < $nfiles; $i++) {
 #				print( "\nfullthumb:$fullthumb\n");
 				# convert has a bug, ignores [frame] option, always give fist frame :-(
 				# use ffmpeg and then create thumb from that
-				$command = "ffmpeg -y -hide_banner -loglevel error -ss 0.5 -i \"$fullfile\" -vframes 1 \"$opt_d/tmp.png\"";
+				$command = "ffmpeg -y -hide_banner -loglevel error -ss 0.5 -i \"$fullfile\" -vframes 1 \"$tmpthumb\"";
 #				print( "\n$command\n\n" );
 				system("$command");
-				$command = "convert $opt_con -scale x$opt_y  \"$opt_d/tmp.png\" \"$opt_d/$thumbbasename.png\"";
+				$command = "convert $opt_con -scale x$opt_y  \"$tmpthumb\" \"$opt_d/$thumbbasename.png\"";
 #				print( "\n$command\n\n" );
-				system( "rm \"$opt_d/tmp.png\"");				
 			} else {
 				$command = "convert $opt_con -scale x$opt_y \"$fullfile\" \"$fullthumb\"";				
 			}
@@ -448,6 +450,13 @@ for ($i = 0; $i < $nfiles; $i++) {
 		print "$thumbprefix$file " if ($command);
 	}
 }
+
+# Do this because removing in the loop seems to delete it 
+# before it can be processed, oh my brain hurts
+if ( -e $tmpthumb ) {	
+	system( "rm $tmpthumb");	
+}			
+
 print "... done!\n";
 
 # determine image file sizes
@@ -797,7 +806,7 @@ for ($page = 0; $page * $paginate < $nfiles; $page++) {
 			}
 			print ".";
 			$altname = $captions[$fileindex];
-			if (isVideo( $imgext[$i] )) { 
+			if (isVideo( $imgext[$fileindex] )) { 
 				$thumbbasename = $imgfiles[$fileindex];
 				$thumbbasename =~ s{^.*/|\.[^.]+$}{}g;
 				$thumbname = $thumbbasename . ".png";
