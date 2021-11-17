@@ -462,8 +462,12 @@ print "... done!\n";
 # determine image file sizes
 if ($HAVEIM && !($opt_bigy)) {
 	print "Determining image sizes ";
-	foreach $file (@imgfiles) {
-		$fullfile = "$opt_d/$file";
+	for ($i = 0; $i < $nfiles; $i++) {
+	
+		$fullfile = "$opt_d/$imgfiles[$i]";
+		if (isVideo( $imgext[$i] )) {
+			next;
+		}
 		$temp = `identify -ping -format \"\%wx\%h %b\" \"$fullfile\"`;
 		$temp =~ m/(\d+)x(\d+)\s([\d\.]+[mkb]*)/i;
 		push(@xdim,$1);  push(@ydim,$2);  $temp = $3;
