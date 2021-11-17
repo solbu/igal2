@@ -2,10 +2,14 @@
 eval 'exec perl -wS $0 ${1+"$@"}'
 	if 0;
 
+
 ############################################################################
 # Please change this accordingly if you change the DESTDIR in the tarball 
 # distribution Makefile or the --prefix of the RPM installation
 $IGALDIR = "/usr/local/share/igal2";
+# debug locally
+#use File::Basename;
+#$IGALDIR = dirname($0);
 # for example if you make DESTDIR=/usr then $IGALDIR="/usr/share/igal2"
 ############################################################################
 #
@@ -73,7 +77,7 @@ $ExifTool = eval "use Image::ExifTool; 1" ? 1 : 0;
 
 
 # some constants
-$VERSION = "2.4";
+$VERSION = "2.5";
 $Getopt::Long::ignorecase = 0;
 $itile = "tile.png";
 $slidetemplate = "slidetemplate2.html"; 
@@ -217,11 +221,10 @@ print "\nWARNING:  commands identify/convert missing!\nThe ImageMagick (imagemag
 
 # find out if the ffmpeg  exist
 $HAVEFF = (&exist("ffmpeg") ) ;
-print "\nWARNING:  commands ffmpeg missing!\nWill be unable to process video files\n\n" unless ($HAVEIM);
+print "\nWARNING:  commands ffmpeg missing!\nWill be unable to process video files\n\n" unless ($HAVEFF);
 
 # give up if no image processing commands can be found
 die "ERROR:  the necessary image processing tools aren't installed on your system.\nPlease obtain them as specified above.\n\n" unless ($HAVEIM or $HAVELJ);
-
 
 # strip any unnecessary slashes from the end of the given $opt_d directory
 $opt_d =~ s/\/$//;
@@ -238,8 +241,15 @@ if ( $HAVEFF ) {
 	@movfiles = grep((!/^\./ and /\.mov$/i), readdir DIR);
 	rewinddir DIR;   # this is CRUCIAL here!!!
 	@mp4files = grep((!/^\./ and /\.mp4$/i), readdir DIR);
+	rewinddir DIR;   # this is CRUCIAL here!!!
+	@mkvfiles = grep((!/^\./ and /\.mkv$/i), readdir DIR);
+	$nmkvfiles = @mkvfiles;
+	if ( $nmkvfiles > 0 && isMac() ) {
+		print "\nWARNING:  mkv files not supported on Mac, suggest converting to mp4\n\n";		
+	}
 	@vidfiles = @movfiles;
 	push(@vidfiles, @mp4files);
+	push(@vidfiles, @mkvfiles);
 	@vidfiles = sort @vidfiles;      # sort alphabetically, by file name
 } else {
 	@vidfiles = ();
@@ -389,10 +399,19 @@ for ($i = 0; $i < $nfiles; $i++) {
 	if ((! -e $fullthumb) or $opt_f) {
 		if ($HAVEIM) {
 			# convert -quiet moviefile.mov[10] movieframe.gif
-			if ($imgext[$i] =~ m/(mov|mp4)/i) {
-				$fullthumb =~ s{^.*/|\.[^.]+$}{}g;
-				$command = "convert $opt_con -scale x$opt_y \"$fullfile\"[10] \"$opt_d/$opt_dest$fullthumb.png\"";
-#				print( "\n\n$command\n\n");
+			if (isVideo( $imgext[$i] )) {
+				$thumbbasename = $fullthumb;
+				$thumbbasename =~ s{^.*/|\.[^.]+$}{}g;
+				
+#				print( "\nfullthumb:$fullthumb\n");
+				# convert has a bug, ignores [frame] option, always give fist frame :-(
+				# use ffmpeg and then create thumb from that
+				$command = "ffmpeg -y -hide_banner -loglevel error -ss 0.5 -i \"$fullfile\" -vframes 1 \"$opt_d/tmp.png\"";
+#				print( "\n$command\n\n" );
+				system("$command");
+				$command = "convert $opt_con -scale x$opt_y  \"$opt_d/tmp.png\" \"$opt_d/$thumbbasename.png\"";
+#				print( "\n$command\n\n" );
+				system( "rm \"$opt_d/tmp.png\"");				
 			} else {
 				$command = "convert $opt_con -scale x$opt_y \"$fullfile\" \"$fullthumb\"";				
 			}
@@ -456,7 +475,7 @@ if ($opt_bigy and !($opt_s)) {
 		print "Scaling down big slides:  ";
 	}
 	for ($i = 0; $i < $nfiles; $i++) {
-		if ($imgext[$i] =~ m/(mov|mp4)/i) {
+		if (isVideo( $imgext[$i] )) {
 			next;
 		}
 		$file = $imgfiles[$i];
@@ -579,7 +598,7 @@ if ($opt_s) {
 	$slidemovtemplate_string = read_file_in_string("$opt_d/$opt_dest.$slidemovtemplate");
 	for ($i = 0; $i < $nfiles; $i++) {
 		$video = 0;
-		if ($imgext[$i] =~ m/(mov|mp4)/i) {
+		if (isVideo( $imgext[$i] )) {
 			$video = 1;
 		}
 		
@@ -606,7 +625,7 @@ if ($opt_s) {
 				$workarea =~ s/(<.*)<!--THIS-IMAGE-->(.)(.*>)/<A href=\"$destback$imgfile_i_encoded\">$1$slide$2 alt=\"$title\" title=\"click to see full-size\"$3<\/a>/;
 			}
 		} else {
-			if ($HAVEIM) {
+			if ($HAVEIM && !$video) {
 				$workarea =~ s/<!--THIS-IMAGE-->(.)/$destback$imgfile_i_encoded$1 width=$xdim[$i] height=$ydim[$i] alt=\"$title\"/g;
 			} else {
 				$workarea =~ s/<!--THIS-IMAGE-->/$destback$imgfile_i_encoded/g;
@@ -778,7 +797,7 @@ for ($page = 0; $page * $paginate < $nfiles; $page++) {
 			}
 			print ".";
 			$altname = $captions[$fileindex];
-			if ($imgext[$fileindex] =~ m/(mov|mp4)/i) { 
+			if (isVideo( $imgext[$i] )) { 
 				$thumbbasename = $imgfiles[$fileindex];
 				$thumbbasename =~ s{^.*/|\.[^.]+$}{}g;
 				$thumbname = $thumbbasename . ".png";
@@ -895,6 +914,20 @@ sub exist {
 		return 1 if (-f "$dir/$program");
     }
 	return 0;
+}
+
+# subroutine to test if accepted video file
+sub isVideo {
+	local($string) = @_;
+	if ($string =~ m/(mov|mp4|mkv)/i) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+sub isMac {
+	return "$^O" eq "darwin";
 }
 
 
