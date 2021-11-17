@@ -10,10 +10,6 @@
     <LINK rel="next" href=<!--NEXT-SLIDE-->>
     <LINK rel="previous" href=<!--PREV-SLIDE-->>
     <SCRIPT type="text/javascript" language="javascript" defer>
-if (document.images)    {
-Image1          = new Image();
-Image1.src      = "<!--NEXT-IMAGE-->";
-}
 function toggle(obj) {
 var el = document.getElementById(obj);
 el.style.display = (el.style.display != 'block' ? 'block' : 'none' );
@@ -37,8 +33,7 @@ el.style.display = (el.style.display != 'block' ? 'block' : 'none' );
       <TABLE bgcolor="#ffffff" cellspacing=0 cellpadding=4>
         <TR>
           <TD class="slide">
- 			 <video width="320" height="240" controls>
-			  <source src="<!--THIS-IMAGE-->" type="video/mp4">
+ 			 <video width="320" height="240" controls src="<!--THIS-IMAGE-->" >
 			Your browser does not support the video tag.
 			</video>
          </TD>
