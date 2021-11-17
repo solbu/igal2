@@ -39,9 +39,11 @@ $HAVELJ = 0;
 #   	2000 Eric Pop,
 #   	2003 Wolfgang Trexler,
 #   	2020 Johnny A. Solbu
+#   	2021 A Martin A. West
 #   This version was enhanced by:
 #   	Wolfgang Trexler (wt) Apr. 2003 - May 2016
 #   	Johnny A. Solbu 2019 - 2020
+#   	A Martin West - 2021 - added video support
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -74,7 +76,8 @@ $ExifTool = eval "use Image::ExifTool; 1" ? 1 : 0;
 $VERSION = "2.4";
 $Getopt::Long::ignorecase = 0;
 $itile = "tile.png";
-$slidetemplate = "slidetemplate2.html";
+$slidetemplate = "slidetemplate2.html"; 
+$slidemovtemplate = "slidemovtemplate2.html"; 
 $indextemplate = "indextemplate2.html";
 $csstemplate = "igal2.css";
 $directorylinefile = "directoryline2.html";
@@ -207,18 +210,43 @@ die "Please enter a nonnegative pagination value\n" if ($opt_pagination < 0);
 $opt_o = "$opt_o/" if ( $opt_o );
 
 die "Critical failure: Lib Image::ExifTool not install but EXIF Tags (option -e) requested\n" if (($ExifTool == 0) and ($opt_e));
- 
+
+# find out if the imagemagick commands exist
+$HAVEIM = (&exist("identify") and &exist("convert")) unless ($HAVEIM);
+print "\nWARNING:  commands identify/convert missing!\nThe ImageMagick (imagemagick.org) or GraphicsMagick package with compatibility doesn't seem to be\ninstalled.  Image dimensions will not be available in the generated HTML.\nOnly JPG images are supported... falling back onto cjpeg/djpeg/pnmscale.\n\n" unless ($HAVEIM);
+
+# find out if the ffmpeg  exist
+$HAVEFF = (&exist("ffmpeg") ) ;
+print "\nWARNING:  commands ffmpeg missing!\nWill be unable to process video files\n\n" unless ($HAVEIM);
+
+# give up if no image processing commands can be found
+die "ERROR:  the necessary image processing tools aren't installed on your system.\nPlease obtain them as specified above.\n\n" unless ($HAVEIM or $HAVELJ);
+
+
 # strip any unnecessary slashes from the end of the given $opt_d directory
 $opt_d =~ s/\/$//;
 
 # let users store their templates in a $HOME/.igal directory, if it exists,
-# instead of the site-wide /usr/lib/igal (from line 8 up top)
+# instead of the site-wide /usr/local/lib/igal (from line 8 up top)
 $IGALDIR = $userigaldir if ((-r $userigaldir) && (-d $userigaldir));
 
 # load up image files from $opt_d into array @imgfiles
 opendir DIR, $opt_d or die "Can't open directory $opt_d\n";
 
-# find and read all jp(e)g, gif and png files
+# find and read all video, jp(e)g, gif and png files
+if ( $HAVEFF ) {
+	@movfiles = grep((!/^\./ and /\.mov$/i), readdir DIR);
+	rewinddir DIR;   # this is CRUCIAL here!!!
+	@mp4files = grep((!/^\./ and /\.mp4$/i), readdir DIR);
+	@vidfiles = @movfiles;
+	push(@vidfiles, @mp4files);
+	@vidfiles = sort @vidfiles;      # sort alphabetically, by file name
+} else {
+	@vidfiles = ();
+}
+
+
+rewinddir DIR;   # this is CRUCIAL here!!!
 @jpgfiles = grep((!/^\./ and /\.jpe?g$/i), readdir DIR);
 rewinddir DIR;   # this is CRUCIAL here!!!
 @giffiles = grep((!/^\./ and /\.gif$/i), readdir DIR);
@@ -227,12 +255,19 @@ rewinddir DIR;   # this is CRUCIAL here!!!
 @imgfiles = @jpgfiles;
 push(@imgfiles, @giffiles);
 push(@imgfiles, @pngfiles);
+push(@imgfiles, @vidfiles);
 
 @imgfiles = sort @imgfiles;      # sort alphabetically, by file name
 $njpg = @jpgfiles;
 $nfiles = @imgfiles;             # how many total image files i've loaded
 
 die "Can't find any image files in directory $opt_d\n" if ($nfiles == 0);
+
+# find out if the libjpeg commands exist
+$HAVELJ = (&exist("cjpeg") and &exist("djpeg") &exist("pnmscale")) unless ($HAVELJ or ($njpg == 0) or $HAVEIM);
+print "\nWARNING:  at least one of the commands \"cjpeg\", \"djpeg\" and \"pnmscale\" is not\ninstalled.  You can find these at rpmfind.net (inside libjpeg and libgr-progs)\nor you can download the source code from:\n    http://www.ijg.org/ and\n    http://netpbm.sourceforge.net/\n\n" unless ($HAVELJ or ($njpg == 0) or $HAVEIM);
+
+
 
 # find and read all directories (except beginning with . and igal destination) for later use
 if ($opt_AddSubdir) {
@@ -325,17 +360,6 @@ if ($opt_c or $opt_C) {
 	print "Found $nfiles image files in directory $opt_d\n";
 }
 
-# find out if the imagemagick commands exist
-$HAVEIM = (&exist("identify") and &exist("convert")) unless ($HAVEIM);
-print "\nWARNING:  commands identify/convert missing!\nThe ImageMagick (imagemagick.org) or GraphicsMagick package with compatibility doesn't seem to be\ninstalled.  Image dimensions will not be available in the generated HTML.\nOnly JPG images are supported... falling back onto cjpeg/djpeg/pnmscale.\n\n" unless ($HAVEIM);
-
-# find out if the libjpeg commands exist
-$HAVELJ = (&exist("cjpeg") and &exist("djpeg") &exist("pnmscale")) unless ($HAVELJ or ($njpg == 0) or $HAVEIM);
-print "\nWARNING:  at least one of the commands \"cjpeg\", \"djpeg\" and \"pnmscale\" is not\ninstalled.  You can find these at rpmfind.net (inside libjpeg and libgr-progs)\nor you can download the source code from:\n    http://www.ijg.org/ and\n    http://netpbm.sourceforge.net/\n\n" unless ($HAVELJ or ($njpg == 0) or $HAVEIM);
-
-# give up if no image processing commands can be found
-die "ERROR:  the necessary image processing tools aren't installed on your system.\nPlease obtain them as specified above.\n\n" unless ($HAVEIM or $HAVELJ);
-
 # initialize the arrays that will hold image file sizes
 @xdim=(); @ydim=(); @isiz=();
 
@@ -364,7 +388,14 @@ for ($i = 0; $i < $nfiles; $i++) {
 	$fullthumb = "$opt_d/$opt_dest$thumbprefix$file";
 	if ((! -e $fullthumb) or $opt_f) {
 		if ($HAVEIM) {
-			$command = "convert $opt_con -scale x$opt_y \"$fullfile\" \"$fullthumb\"";
+			# convert -quiet moviefile.mov[10] movieframe.gif
+			if ($imgext[$i] =~ m/(mov|mp4)/i) {
+				$fullthumb =~ s{^.*/|\.[^.]+$}{}g;
+				$command = "convert $opt_con -scale x$opt_y \"$fullfile\"[10] \"$opt_d/$opt_dest$fullthumb.png\"";
+#				print( "\n\n$command\n\n");
+			} else {
+				$command = "convert $opt_con -scale x$opt_y \"$fullfile\" \"$fullthumb\"";				
+			}
 			# opt_xy handling: determine dimensions and scale the bigger dimension
 			# Bug fixing code new since version 1.4.7
 			if ($opt_xy) {
@@ -376,11 +407,15 @@ for ($i = 0; $i < $nfiles; $i++) {
 				} else {
 				    $dimension = "x" . "$opt_xy";
 				}
-				$command = "convert $opt_con -scale $dimension \"$fullfile\" \"$fullthumb\"";
-			}
+				if ($imgext[$i] =~ m/(mov|mp4)/i) {
+					$fullthumb =~ s{^.*/|\.[^.]+$}{}g;
+					$command = "convert $opt_con -scale $dimension \"$fullfile\"[10] \"$fullthumb.png\"";
+				} else {}
+					$command = "convert $opt_con -scale $dimension \"$fullfile\" \"$fullthumb\"";
+				}
 		} else {
-			if ($imgext[$i] =~ m/(gif|png)/i) {
-				print "\nIgnoring $file:  get ImageMagick (imagemagick.org) to process GIF and PNG files.\n";
+			if ($imgext[$i] =~ m/(gif|png|mov|mp4)/i) {
+				print "\nIgnoring $file:  get ImageMagick (imagemagick.org) to process video, GIF and PNG files.\n";
 				$command = 0;
 			} else {
 				$com1 = "djpeg \"$fullfile\"";
@@ -421,6 +456,9 @@ if ($opt_bigy and !($opt_s)) {
 		print "Scaling down big slides:  ";
 	}
 	for ($i = 0; $i < $nfiles; $i++) {
+		if ($imgext[$i] =~ m/(mov|mp4)/i) {
+			next;
+		}
 		$file = $imgfiles[$i];
 		$fullfile = "$opt_d/$file";
 		die "Can't open $fullfile\n" unless (-r $fullfile);
@@ -461,6 +499,9 @@ if ( $opt_m ) {
         die "Cannot open watermark file $opt_m" if ( ! -r $opt_m );
         print "Adding watermarks:";
 	for ($i = 0; $i < $nfiles; $i++) {
+		if ($imgext[$i] =~ m/(mov|mp4)/i) {
+			next;
+		}
 		$file = $imgfiles[$i];
 		$original = "$file.unmarked";
 		# If original exists, user has re-run the script - don't
@@ -512,6 +553,7 @@ if ($opt_s) {
 	} else {
 		print "Found CSS template file $opt_dest$csstemplate ... using it.\n";
 	}
+	
 	if (! -e "$opt_d/$opt_dest.$slidetemplate") {
 		print "No $opt_dest.$slidetemplate file ... getting a copy from $IGALDIR/\n";
 		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
@@ -520,11 +562,32 @@ if ($opt_s) {
 	} else {
 		print "Found $opt_dest.$slidetemplate file ... using it.\n";
 	}
+	
+	if (! -e "$opt_d/$opt_dest.$slidemovtemplate") {
+		print "No $opt_dest.$slidemovtemplate file ... getting a copy from $IGALDIR/\n";
+		die "$IGALDIR cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r $IGALDIR);
+		die "$IGALDIR/$slidemovtemplate cannot be read or does not exist.\nPlease install igal properly.\n" unless (-r "$IGALDIR/$slidemovtemplate");
+		system("cp -f $IGALDIR/$slidemovtemplate \"$opt_d/$opt_dest.$slidemovtemplate\"");
+	} else {
+		print "Found $opt_dest.$slidemovtemplate file ... using it.\n";
+	}
+	
+	
 	print "Creating individual slides:  ";
 	# read slidetemplate from filesystem once
 	$slidetemplate_string = read_file_in_string("$opt_d/$opt_dest.$slidetemplate");
+	$slidemovtemplate_string = read_file_in_string("$opt_d/$opt_dest.$slidemovtemplate");
 	for ($i = 0; $i < $nfiles; $i++) {
-		$workarea = $slidetemplate_string;	# fill work area with slidetemplate
+		$video = 0;
+		if ($imgext[$i] =~ m/(mov|mp4)/i) {
+			$video = 1;
+		}
+		
+		if ($video) {
+			$workarea = $slidemovtemplate_string;	# fill work area with slidetemplate
+		} else {
+			$workarea = $slidetemplate_string;	# fill work area with slidetemplate
+		}
 		open(SW,">$opt_d/$opt_dest$slides[$i]") or die "Can't create slide file\n";
 		print "$slides[$i] ";
 		if ($opt_k) {    # use image caption for the HTML slide title
@@ -535,7 +598,7 @@ if ($opt_s) {
 		}
 		$workarea =~ s/<!--SLIDE-TITLE-->/$title/g;
 		$imgfile_i_encoded = URLencode($imgfiles[$i]);
-		if ($opt_bigy) {
+		if ($opt_bigy && !$video) {
 			$slide = URLencode($slideprefix . $imgfiles[$i]);
 			if ($HAVEIM) {
 				$workarea =~ s/(<.*)<!--THIS-IMAGE-->(.)(.*>)/<A href=\"$destback$imgfile_i_encoded\">$1$slide$2 width=$xdim[$i] height=$ydim[$i] alt=\"$title\" title=\"click to see full-size\"$3<\/a>/;
@@ -715,14 +778,22 @@ for ($page = 0; $page * $paginate < $nfiles; $page++) {
 			}
 			print ".";
 			$altname = $captions[$fileindex];
-			$thumb = $opt_dest . $thumbprefix . $imgfiles[$fileindex];
-			$thumbEncoded = $opt_dest . URLencode($thumbprefix . $imgfiles[$fileindex]);
+			if ($imgext[$fileindex] =~ m/(mov|mp4)/i) { 
+				$thumbbasename = $imgfiles[$fileindex];
+				$thumbbasename =~ s{^.*/|\.[^.]+$}{}g;
+				$thumbname = $thumbbasename . ".png";
+				$thumb = $opt_dest . $thumbprefix . $thumbname;
+				$thumbEncoded = $opt_dest . URLencode($thumbprefix . $thumbname );
+			} else {
+				$thumb = $opt_dest . $thumbprefix . $imgfiles[$fileindex];
+				$thumbEncoded = $opt_dest . URLencode($thumbprefix . $imgfiles[$fileindex]);
+			}
 			if ($HAVEIM) {
 				$temp = `identify -ping -format \"\%wx\%h\" \"$opt_d/$thumb\"`;
 				$temp =~ m/(\d+)x(\d+)/;  $x=$1;  $y=$2;
 				$output .= "<IMG src=\"" . $thumbEncoded . "\" width=$x height=$y alt=\"$altname\" title=\"$altname\" border=0>";
 			} else {
-				$output .= "<IMG src=\"" . $thumbEncoded . "\" alt=\"$altname\" title=\"$altname\" border=0>";
+				$output .= "<IMG src=\"" . $thumb . "\" alt=\"$altname\" title=\"$altname\" border=0>";
 			}
 			$output .= "</A></TD>\n";
 		}
