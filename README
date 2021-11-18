@@ -3,6 +3,7 @@
 
 iGal2 needs Perl to run and either cjpeg/djpeg/pnmscale (from libjpeg) 
 or ImageMagick or GraphicksMagick to generate your thumbnails. 
+As of version 3.0 it needs ffmpeg when generating html5 video pages.
 These come standard with most Linux distributions today.
 
 ------------------------------------------------------------------------
