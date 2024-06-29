@@ -77,7 +77,7 @@ $ExifTool = eval "use Image::ExifTool; 1" ? 1 : 0;
 
 
 # some constants
-$VERSION = "3.0";
+$VERSION = "3.2";
 $Getopt::Long::ignorecase = 0;
 $itile = "tile.png";
 $slidetemplate = "slidetemplate2.html"; 
