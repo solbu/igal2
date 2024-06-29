@@ -1,6 +1,7 @@
 2024-06-29  Johnny A. Solbu <johnny@solbu.net>
 
-	* Added support to specify directory for templates.
+	* Version 3.2
+	* Add support to specify directory for templates.
 
 2021-11-18  Johnny A. Solbu <johnny@solbu.net>
 
