@@ -86,7 +86,6 @@ $indextemplate = "indextemplate2.html";
 $csstemplate = "igal2.css";
 $directorylinefile = "directoryline2.html";
 $captionfile = ".captions";
-$userigaldir = "$ENV{'HOME'}/.igal2";
 $thumbprefix = ".thumb_";
 $slideprefix = ".slide_";
 $destback = "";
@@ -123,6 +122,8 @@ $opt_xy = "0";         # scale thumbs to n pixels in their longer dimension
 $opt_dest = "";        # Destination directory of helper files
 $opt_AddSubdir = "0";  # Add subdirectories to index.html file
 $opt_pagination = "0"; # maximum number of images on one page, zero means no pagination
+$opt_igaldir = "$ENV{'HOME'}/.igal2"; # Directory where to look for custom templates
+
 
 $usage = <<"END_OF_USAGE";
 This is iGal2 v$VERSION an HTML image slide show generator.
@@ -178,13 +179,14 @@ Options:     -a           write image sizes under thumbnails on index page
                           is started. Pagination number <n> should be a multiple 
                           of parameter -w (default 5).
                           Default 0 - means no pagination at all.
+              --igaldir   Use custom templates from this directory (\$HOME/.igal)
 Note:         default values are given in parentheses (where applicable).
 Authors:      Johnny A. Solbu <johnny\@solbu.net>
               Wolfgang Trexler <wt-igal\@trexler.at>
               Eric Pop <epop\@stanford.edu> (original igal)
 	      contributions: 
               Stewart Addison <contactsxa\@gmail.com>, Riku Kalinen,
-              Alexander Zangerl
+              Alexander Zangerl, Daniel Weuthen
 URL:          https://github.com/solbu/igal2
 END_OF_USAGE
 
@@ -195,7 +197,7 @@ END_OF_USAGE
 GetOptions('a','c','C','d=s','e','f','h','i=s','k','m=s','n','o=s',
            'p=i','r','s','t=i','u','w=i','x','y=i','ad','as',
            'bigy=i', 'con=s','help','im','www','xy=i', 'dest=s', 
-	   'AddSubdir', 'pagination=s') or die "$usage";
+	   'AddSubdir', 'pagination=s', 'igaldir=s') or die "$usage";
 
 die $usage if ($opt_help or $opt_h);
 # deal with the competing -y and --xy options
@@ -231,7 +233,7 @@ $opt_d =~ s/\/$//;
 
 # let users store their templates in a $HOME/.igal directory, if it exists,
 # instead of the site-wide /usr/local/lib/igal (from line 8 up top)
-$IGALDIR = $userigaldir if ((-r $userigaldir) && (-d $userigaldir));
+$IGALDIR = $opt_igaldir if ((-r $opt_igaldir) && (-d $opt_igaldir));
 
 # load up image files from $opt_d into array @imgfiles
 opendir DIR, $opt_d or die "Can't open directory $opt_d\n";
