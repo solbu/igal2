@@ -183,7 +183,7 @@ Options:     -a           write image sizes under thumbnails on index page
                           is started. Pagination number <n> should be a multiple 
                           of parameter -w (default 5).
                           Default 0 - means no pagination at all.
-              --igaldir   Use custom templates from this directory (\$HOME/.igal)
+              --igaldir   Use custom templates from this directory (\$HOME/.igal2)
 Note:         default values are given in parentheses (where applicable).
 Authors:      Johnny A. Solbu <johnny\@solbu.net>
               Wolfgang Trexler <wt-igal\@trexler.at>
