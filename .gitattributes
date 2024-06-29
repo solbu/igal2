@@ -1,0 +1,3 @@
+# Ignore files when generating tarballs
+.gitattributes export-ignore
+.gitignore export-ignore
